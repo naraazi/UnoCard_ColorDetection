@@ -2,9 +2,10 @@ import cv2
 import numpy as np
 import serial
 import time
+from playsound import playsound
 
 # -- you can change the port here
-ser = serial.Serial('/dev/ttyUSB0', 9600)
+ser = serial.Serial('/dev/ttyACM0', 9600)
 time.sleep(2)
 
 color_ranges = {
@@ -15,6 +16,18 @@ color_ranges = {
 }
 
 colors_state = {color: False for color in color_ranges}
+audio_files = {
+    "red": "/home/lorenzo/Python/DesenvolvimentoIA/UnoColorDetector/assets/red.mp3",
+    "yellow": "/home/lorenzo/Python/DesenvolvimentoIA/UnoColorDetector/assets/yellow.mp3",
+    "green": "/home/lorenzo/Python/DesenvolvimentoIA/UnoColorDetector/assets/green.mp3",
+    "blue": "/home/lorenzo/Python/DesenvolvimentoIA/UnoColorDetector/assets/blue.mp3",
+    "all_colors": "/home/lorenzo/Python/DesenvolvimentoIA/UnoColorDetector/assets/all_colors.mp3"
+}
+
+
+def play_audio(color):
+    if color in audio_files:
+        playsound(audio_files[color])
 
 
 def process_frame(frame):
@@ -37,6 +50,7 @@ def process_frame(frame):
     if len(colors_detected) == len(color_ranges):
         if not all(colors_state.values()):
             ser.write(b'a')
+            play_audio("all_colors")
             for color in colors_state:
                 colors_state[color] = True
         return result, "All the colors!"
@@ -45,6 +59,7 @@ def process_frame(frame):
         predominant_color = max(colors_detected, key=colors_detected.get)
         if not colors_state[predominant_color]:
             ser.write(predominant_color[0].encode())
+            play_audio(predominant_color)
             colors_state[predominant_color] = True
         return result, predominant_color
 
@@ -55,7 +70,7 @@ def process_frame(frame):
 
 
 def main():
-    cap = cv2.VideoCapture(2)
+    cap = cv2.VideoCapture(2)  # -- change the camera source right here
 
     while True:
         ret, frame = cap.read()
