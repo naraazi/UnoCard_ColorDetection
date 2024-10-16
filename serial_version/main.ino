@@ -2,10 +2,10 @@ char receivedChar;
 boolean newData = false;
 
 // -- you can change the pins right here
-const int redLed = 12;
-const int yellowLed = 11;
-const int greenLed = 10;
-const int blueLed = 13;
+const int redLed = 4;
+const int yellowLed = 2;
+const int greenLed = 5;
+const int blueLed = 3;
 
 void setup() {
     Serial.begin(9600);
